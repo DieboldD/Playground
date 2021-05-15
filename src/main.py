@@ -9,7 +9,7 @@ app = FastAPI()
 @app.get("/")
 def hello_world():
     name = os.environ.get("NAME", "World")
-    return "Hello {}!".format(name)
+    return "Hello CICD {}!".format(name)
 
 
 if __name__ == "__main__":
