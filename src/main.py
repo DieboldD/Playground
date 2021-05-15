@@ -27,7 +27,7 @@ def hello_world():
     name = os.environ.get("NAME", "World")
     return {"message":"Hello CICD {}!".format(name)}
 
-@app.get("/showByRating/", response_model=List[schemas.SummaryCount])
+@app.get("/showByRating/", response_model=List[str])
 def show_summary(db: Session = Depends(get_db)):
     summary = db.query(models.Show.rating,func.count(models.Show.rating)).all()
     return jsonable_encoder(summary)
