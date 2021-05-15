@@ -8,7 +8,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session, relationship
 
 import models,schemas
-from src.database import SessionLocal, engine, show
+from src.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
