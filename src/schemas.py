@@ -14,3 +14,5 @@ class ShowBase(BaseModel):
     duration: str
     listed_in: str
     description: Optional[str] = None
+    class Config:
+        orm_mode=True
