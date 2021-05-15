@@ -5,11 +5,10 @@ from typing import List
 from fastapi import Depends,FastAPI,HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.param_functions import Query
-from sqlalchemy import func
+from sqlalchemy import func, extract
 from sqlalchemy.sql import label
 from sqlalchemy.orm import Session, relationship
-from sqlalchemy.sql.functions import current_date
-from sqlalchemy.sql.sqltypes import Date
+
 
 import models,schemas
 from src.database import SessionLocal, engine
@@ -40,9 +39,9 @@ def show_summary(db: Session = Depends(get_db)):
     Show Aggregation, via SQLAlchemy query
     """
     ratingAggregation = db.query(models.Show.rating,
-                           models.Show.date_added,
+                            extract('year',models.Show.date_added),
                             label('total',func.count())
-                            ).group_by(models.Show.rating,models.Show.date_added).all()
+                            ).group_by(models.Show.rating,extract('year',models.Show.date_added)).all()
     aggregation = {"ShowsAddedByRatingByYear":ratingAggregation}
     return jsonable_encoder(aggregation)
 
