@@ -1,15 +1,16 @@
 import os
-
+import uvicorn
 from fastapi import FastAPI
 
-app = FastAPI(__name__)
+
+app = FastAPI()
 
 
-@app.route("/")
+@app.get("/")
 def hello_world():
     name = os.environ.get("NAME", "World")
     return "Hello {}!".format(name)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    uvicorn.run(app,host="0.0.0.0",port=8000)
