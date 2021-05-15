@@ -4,9 +4,12 @@ from typing import List
 
 from fastapi import Depends,FastAPI,HTTPException
 from fastapi.encoders import jsonable_encoder
+from fastapi.param_functions import Query
 from sqlalchemy import func
 from sqlalchemy.sql import label
 from sqlalchemy.orm import Session, relationship
+from sqlalchemy.sql.functions import current_date
+from sqlalchemy.sql.sqltypes import Date
 
 import models,schemas
 from src.database import SessionLocal, engine
@@ -31,24 +34,68 @@ def hello_world():
     name = os.environ.get("NAME", "World")
     return {"message":"Hello CICD {}!".format(name)}
 
-@app.get("/showByRating/")
+@app.get("/showAggregation/")
 def show_summary(db: Session = Depends(get_db)):
     """
-    Summary By Rating, via SQLAlchemy query
+    Show Aggregation, via SQLAlchemy query
     """
-    summary = db.query(models.Show.rating,label('total',func.count(models.Show.rating))).group_by(models.Show.rating).all()
-    return jsonable_encoder(summary)
+    ratingAggregation = db.query(models.Show.rating,
+                           models.Show.date_added,
+                            label('total',func.count(models.Show.rating,models.Show.date_added))
+                            ).group_by(models.Show.rating,models.Show.date_added).all()
+    aggregation = {"ShowsAddedByRatingByYear":ratingAggregation}
+    return jsonable_encoder(aggregation)
 
 @app.get("/shows/", response_model=List[schemas.ShowBase])
 def show_records(db: Session = Depends(get_db)):
     """
-    Get Records
-    TODO - Add Pagination
-         - Search
+    Raw Get Records
     """
     shows = db.query(models.Show).all()
     return shows
 
+@app.post("/shows/search/")
+def search_shows(searchSchema:schemas.SearchSchema,db:Session=Depends(get_db)):
+    """
+    Search by data
+    """
+    s=searchSchema.criteria
+    baseQuery = db.query(models.Show)
+
+    if s.show_id is not None:
+        baseQuery= baseQuery.filter_by(models.Show.show_id == s.show_id)
+    if s.type is not None:
+        baseQuery= baseQuery.filter_by(models.Show.type == s.type)
+    if s.title is not None:
+        baseQuery= baseQuery.filter_by(s.title in models.Show.title)
+    if s.director is not None:
+        baseQuery= baseQuery.filter_by(s.director in models.Show.director)
+    if s.cast is not None:
+        baseQuery= baseQuery.filter_by(s.cast in models.Show.cast)
+    if s.country is not None:
+        baseQuery= baseQuery.filter_by(models.Show.country == s.country)
+    if s.date_added is not None:
+        baseQuery= baseQuery.filter_by(models.Show.date_added == s.date_added)
+    if s.release_year is not None:
+        baseQuery= baseQuery.filter_by(models.Show.release_year == s.release_year)
+    if s.rating is not None:
+        baseQuery= baseQuery.filter_by(models.Show.rating == s.rating)
+    if s.duration is not None:
+        baseQuery= baseQuery.filter_by(s.duration in models.Show.duration)
+    if s.listed_in is not None:
+        baseQuery= baseQuery.filter_by(s.listed_in in models.Show.listed_in)
+    if s.description is not None:
+        baseQuery= baseQuery.filter_by(s.description in models.Show.description)
+
+    if searchSchema.max_results is not None:
+        baseQuery=baseQuery.limit(searchSchema.max_results)
+    
+    if searchSchema.results_per_page is not None:
+        baseQuery=baseQuery.slice(searchSchema.page_number*searchSchema.results_per_page,searchSchema.page_number*searchSchema.results_per_page+searchSchema.results_per_page)
+
+    result = baseQuery.all()
+    return result
+            
 @app.get("/show/{id}", response_model=schemas.ShowBase)
 def get_show(id:int,db: Session= Depends(get_db)):
     """

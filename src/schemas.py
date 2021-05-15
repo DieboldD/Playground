@@ -42,3 +42,29 @@ class ShowCreate(BaseModel):
     class Config:
         orm_mode=True
 
+class ShowSearch(BaseModel):
+    show_id: Optional[str] = None
+    type: Optional[str] = None
+    title: Optional[str] = None
+    director: Optional[str] = None
+    cast: Optional[str] = None
+    country: Optional[str] = None
+    date_added:  Optional[date] = None
+    release_year:  Optional[int] = None
+    rating:  Optional[str] = None
+    duration:  Optional[str] = None
+    listed_in:  Optional[str] = None
+    description: Optional[str] = None
+    class Config:
+        orm_mode=True
+
+class SearchSchema(BaseModel):
+    """
+    Search model - reuse the create model, with additional fields for simple pagination
+    """
+    criteria:ShowSearch
+    max_results:int
+    results_per_page:int
+    page_number:int
+    class Config:
+        orm_mode=True
