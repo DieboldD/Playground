@@ -29,7 +29,7 @@ def hello_world():
 
 @app.get("/showByRating/", response_model=List[str])
 def show_summary(db: Session = Depends(get_db)):
-    summary = db.query(models.Show.rating,func.count(models.Show.rating)).all()
+    summary = db.query(models.Show.rating,func.count(models.Show.rating)).group_by(models.Show.rating).all()
     return jsonable_encoder(summary)
 
 @app.get("/shows/", response_model=List[schemas.ShowBase])
