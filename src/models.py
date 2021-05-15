@@ -7,9 +7,13 @@ from src.database import Base
 
 @dataclass
 class Show(Base):
+    """
+    Representation of the Show table.
+    """
     __tablename__ = "shows"
 
-    show_id = Column(String,primary_key=True,index=True)
+    id = Column(int,primary_key=True,index=True)
+    show_id = Column(String,index=True)
     type = Column(String)
     title = Column(String)
     director = Column(String)
