@@ -12,12 +12,12 @@ h11==0.12.0
 httptools==0.2.0
 idna==2.10
 iniconfig==1.1.1
-mysqlclient==2.0.3
 packaging==20.9
 pipenv==2020.11.15
 pluggy==0.13.1
 py==1.10.0
 pydantic==1.8.2
+PyMySQL==1.0.2
 pyparsing==2.4.7
 pytest==6.2.4
 requests==2.25.1
