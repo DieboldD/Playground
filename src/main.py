@@ -41,7 +41,7 @@ def show_summary(db: Session = Depends(get_db)):
     """
     ratingAggregation = db.query(models.Show.rating,
                            models.Show.date_added,
-                            label('total',func.count(models.Show.rating,models.Show.date_added))
+                            label('total',func.count())
                             ).group_by(models.Show.rating,models.Show.date_added).all()
     aggregation = {"ShowsAddedByRatingByYear":ratingAggregation}
     return jsonable_encoder(aggregation)
