@@ -8,6 +8,7 @@ from fastapi.param_functions import Query
 from sqlalchemy import func, extract
 from sqlalchemy.sql import label
 from sqlalchemy.orm import Session, relationship
+from sqlalchemy.sql.functions import current_date
 
 
 import models,schemas
@@ -38,11 +39,13 @@ def show_summary(db: Session = Depends(get_db)):
     """
     Show Aggregation, via SQLAlchemy query
     """
-    ratingAggregation = db.query(models.Show.rating,
-                            extract('year',models.Show.date_added),
+    baseQuery = db.query(models.Show.rating,
+                            label('year_added',extract('year',models.Show.date_added)),
                             label('total',func.count())
-                            ).group_by(models.Show.rating,extract('year',models.Show.date_added)).all()
-    aggregation = {"ShowsAddedByRatingByYear":ratingAggregation}
+                            ).group_by(models.Show.rating,extract('year',models.Show.date_added))
+    ratingAggregation = baseQuery.all()
+    last5Years = baseQuery.filter_by(extract('year',models.Show.date_added) <= extract('year',current_date)).all()
+    aggregation = {{"ShowsAddedByRatingByYear":ratingAggregation},{"WithinTheLast5Years":last5Years}}
     return jsonable_encoder(aggregation)
 
 @app.get("/shows/", response_model=List[schemas.ShowBase])
