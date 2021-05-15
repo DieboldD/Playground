@@ -44,7 +44,7 @@ def show_summary(db: Session = Depends(get_db)):
                             label('total',func.count())
                             ).group_by(models.Show.rating,extract('year',models.Show.date_added))
     ratingAggregation = baseQuery.all()
-    last5Years = baseQuery.filter_by(extract('year',models.Show.date_added) <= 2021).all()
+    last5Years = baseQuery.filter(extract('year',models.Show.date_added) <= 2021).all()
     aggregation = {{"ShowsAddedByRatingByYear":ratingAggregation},{"WithinTheLast5Years":last5Years}}
     return jsonable_encoder(aggregation)
 
