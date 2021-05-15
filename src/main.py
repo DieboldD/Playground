@@ -45,7 +45,7 @@ def show_summary(db: Session = Depends(get_db)):
                             ).group_by(models.Show.rating,extract('year',models.Show.date_added))
     ratingAggregation = baseQuery.all()
     last5Years = baseQuery.filter(extract('year',models.Show.date_added) <= 2021).all()
-    aggregation = {{"ShowsAddedByRatingByYear":ratingAggregation},{"WithinTheLast5Years":last5Years}}
+    aggregation = {"Summary",{"ShowsAddedByRatingByYear":ratingAggregation},{"WithinTheLast5Years":last5Years}}
     return jsonable_encoder(aggregation)
 
 @app.get("/shows/", response_model=List[schemas.ShowBase])
