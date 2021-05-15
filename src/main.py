@@ -57,7 +57,9 @@ def show_records(db: Session = Depends(get_db)):
 @app.post("/shows/search/")
 def search_shows(searchSchema:schemas.SearchSchema,db:Session=Depends(get_db)):
     """
-    Search by data
+    Search by data:
+    If a field is not none, then it is considered.
+    If results are limited, but page number is not supplied, only the first page will be returned.
     """
     s=searchSchema.criteria
     baseQuery = db.query(models.Show)

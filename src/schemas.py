@@ -60,11 +60,12 @@ class ShowSearch(BaseModel):
 
 class SearchSchema(BaseModel):
     """
-    Search model - reuse the create model, with additional fields for simple pagination
+    Search model with additional fields for simple pagination
+    If results are limited, but page number is not supplied, only the first page will be returned.
     """
     criteria:ShowSearch
-    max_results:int
-    results_per_page:int
-    page_number:int
+    max_results:Optional[int]=None
+    results_per_page:Optional[int]=None
+    page_number:Optional[int]=1
     class Config:
         orm_mode=True
