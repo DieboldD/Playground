@@ -24,25 +24,42 @@ def get_db():
 
 @app.get("/")
 def hello_world():
+    """
+    Typical Hello World.
+    """
     name = os.environ.get("NAME", "World")
     return {"message":"Hello CICD {}!".format(name)}
 
-@app.get("/showByRating/", response_model=List[str])
+@app.get("/showByRating/")
 def show_summary(db: Session = Depends(get_db)):
+    """
+    Summary By Rating, via SQLAlchemy query
+    """
     summary = db.query(models.Show.rating,func.count(models.Show.rating)).group_by(models.Show.rating).all()
     return jsonable_encoder(summary)
 
 @app.get("/shows/", response_model=List[schemas.ShowBase])
 def show_records(db: Session = Depends(get_db)):
+    """
+    Get Records
+    TODO - Add Pagination
+         - Search
+    """
     shows = db.query(models.Show).all()
     return shows
 
-@app.get("/show/{show_id}", response_model=schemas.ShowBase)
-def get_show(show_id:str,db: Session= Depends(get_db)):
-    return db.query(models.Show).filter(models.Show.show_id == show_id).first()
+@app.get("/show/{id}", response_model=schemas.ShowBase)
+def get_show(id:int,db: Session= Depends(get_db)):
+    """
+    Get Show by primary key
+    """
+    return db.query(models.Show).filter(models.Show.id == id).first()
 
 @app.post("/show/", response_model=schemas.ShowBase)
 def create(s:schemas.ShowCreate, db: Session=Depends(get_db)):
+    """
+    Create Show
+    """
     target = models.Show(show_id= s.show_id,
         type = s.type,
         title = s.title,
@@ -63,6 +80,9 @@ def create(s:schemas.ShowCreate, db: Session=Depends(get_db)):
 
 @app.put("/show/{id}", response_model=schemas.ShowBase)
 def update(id:int, s:schemas.ShowCreate, db: Session=Depends(get_db)):
+    """
+    Update existing show.
+    """
     target = db.query(models.Show).filter(models.Show.id==id).first()
     target.show_id= s.show_id
     target.type = s.type
@@ -83,6 +103,9 @@ def update(id:int, s:schemas.ShowCreate, db: Session=Depends(get_db)):
 
 @app.delete("/show/{id}")
 def delete(id:int, db: Session=Depends(get_db)):
+    """
+    Delete show by primary key.
+    """
     target = db.query(models.Show).filter(models.Show.id==id).first()
     db.delete(target)
     db.commit()
