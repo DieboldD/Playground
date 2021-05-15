@@ -5,6 +5,7 @@ from typing import List
 from fastapi import Depends,FastAPI,HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func
+from sqlalchemy.sql import label
 from sqlalchemy.orm import Session, relationship
 
 import models,schemas
@@ -35,7 +36,7 @@ def show_summary(db: Session = Depends(get_db)):
     """
     Summary By Rating, via SQLAlchemy query
     """
-    summary = db.query(models.Show.rating,func.count(models.Show.rating)).group_by(models.Show.rating).all()
+    summary = db.query(models.Show.rating,label('total',func.count(models.Show.rating))).group_by(models.Show.rating).all()
     return jsonable_encoder(summary)
 
 @app.get("/shows/", response_model=List[schemas.ShowBase])
