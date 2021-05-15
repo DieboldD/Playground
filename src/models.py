@@ -12,7 +12,7 @@ class Show(Base):
     """
     __tablename__ = "shows"
 
-    id = Column(int,primary_key=True,index=True)
+    id = Column(Integer,primary_key=True,index=True)
     show_id = Column(String,index=True)
     type = Column(String)
     title = Column(String)
