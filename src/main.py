@@ -68,29 +68,29 @@ def search_shows(searchSchema:schemas.SearchSchema,db:Session=Depends(get_db)):
     baseQuery = db.query(models.Show)
 
     if s.show_id is not None:
-        baseQuery= baseQuery.filter_by(models.Show.show_id == s.show_id)
+        baseQuery= baseQuery.filter(models.Show.show_id == s.show_id)
     if s.type is not None:
-        baseQuery= baseQuery.filter_by(models.Show.type == s.type)
+        baseQuery= baseQuery.filter(models.Show.type == s.type)
     if s.title is not None:
-        baseQuery= baseQuery.filter_by(s.title in models.Show.title)
+        baseQuery= baseQuery.filter(models.Show.title.like("%{}%".format(s.title)))
     if s.director is not None:
-        baseQuery= baseQuery.filter_by(s.director in models.Show.director)
+        baseQuery= baseQuery.filter(models.Show.director.like("%{}%".format(s.director)))
     if s.cast is not None:
-        baseQuery= baseQuery.filter_by(s.cast in models.Show.cast)
+        baseQuery= baseQuery.filter(models.Show.cast.like("%{}%".format(s.cast)))
     if s.country is not None:
-        baseQuery= baseQuery.filter_by(models.Show.country == s.country)
+        baseQuery= baseQuery.filter(models.Show.country == s.country)
     if s.date_added is not None:
-        baseQuery= baseQuery.filter_by(models.Show.date_added == s.date_added)
+        baseQuery= baseQuery.filter(models.Show.date_added == s.date_added)
     if s.release_year is not None:
-        baseQuery= baseQuery.filter_by(models.Show.release_year == s.release_year)
+        baseQuery= baseQuery.filter(models.Show.release_year == s.release_year)
     if s.rating is not None:
-        baseQuery= baseQuery.filter_by(models.Show.rating == s.rating)
+        baseQuery= baseQuery.filter(models.Show.rating == s.rating)
     if s.duration is not None:
-        baseQuery= baseQuery.filter_by(s.duration in models.Show.duration)
+        baseQuery= baseQuery.filter(models.Show.duration.like("%{}%".format(s.duration)))
     if s.listed_in is not None:
-        baseQuery= baseQuery.filter_by(s.listed_in in models.Show.listed_in)
+        baseQuery= baseQuery.filter(models.Show.listed_in.like("%{}%".format(s.listed_in)))
     if s.description is not None:
-        baseQuery= baseQuery.filter_by(s.description in models.Show.description)
+        baseQuery= baseQuery.filter(models.Show.description.like("%{}%".format(s.description)))
 
     if searchSchema.max_results is not None:
         baseQuery=baseQuery.limit(searchSchema.max_results)
