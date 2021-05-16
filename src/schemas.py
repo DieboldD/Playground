@@ -12,13 +12,13 @@ class ShowBase(BaseModel):
     title: constr(max_length=200)
     director: Optional[constr(max_length=300)] = ""
     cast: Optional[constr(max_length=1000)] = ""
-    country: constr(200)
+    country: constr(max_length=200)
     date_added: date
     release_year: int
-    rating: constr(20)
-    duration: constr(20)
-    listed_in: constr(500)
-    description: Optional[constr(2000)] = ""
+    rating: constr(max_length=20)
+    duration: constr(max_length=20)
+    listed_in: constr(max_length=500)
+    description: Optional[constr(max_length=000)] = ""
     class Config:
         orm_mode=True
 
@@ -32,13 +32,13 @@ class ShowCreate(BaseModel):
     title: constr(max_length=200)
     director: Optional[constr(max_length=300)] = ""
     cast: Optional[constr(max_length=1000)] = ""
-    country: constr(200)
+    country: constr(max_length=200)
     date_added: date
     release_year: int
-    rating: constr(20)
-    duration: constr(20)
-    listed_in: constr(500)
-    description: Optional[constr(2000)] = ""
+    rating: constr(max_length=20)
+    duration: constr(max_length=20)
+    listed_in: constr(max_length=500)
+    description: Optional[constr(max_length=2000)] = ""
     class Config:
         orm_mode=True
 
@@ -48,13 +48,13 @@ class ShowSearch(BaseModel):
     title: Optional[constr(max_length=200)]=None
     director: Optional[constr(max_length=300)] = None
     cast: Optional[constr(max_length=1000)] = None
-    country: Optional[constr(200)]=None
+    country: Optional[constr(max_length=200)]=None
     date_added: Optional[date]=None
     release_year: Optional[int]=None
-    rating: Optional[constr(20)]=None
-    duration: Optional[constr(20)]=None
-    listed_in: Optional[constr(500)]=None
-    description: Optional[constr(2000)] = None
+    rating: Optional[constr(max_length=20)]=None
+    duration: Optional[constr(max_length=20)]=None
+    listed_in: Optional[constr(max_length=500)]=None
+    description: Optional[constr(max_length=2000)] = None
     class Config:
         orm_mode=True
 
