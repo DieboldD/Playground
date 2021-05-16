@@ -1,6 +1,6 @@
 ## Playground
 # Documentation
-- OpenAPI Docs - https://playground-ahh5sdhvaq-uc.a.run.app/docs
+- OpenAPI Docs are hosted from the server.
 - Pycco Docs are included in the repository.
 
 ![image](https://user-images.githubusercontent.com/84106413/118384759-c6ed4780-b5d6-11eb-802e-8cb15e1c73ac.png)
