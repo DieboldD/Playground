@@ -1,24 +1,24 @@
 from datetime import date
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, constr,conint
 
 class ShowBase(BaseModel):
     """
     Standard response schema.
     """
-    id: int
-    show_id: str
-    type: str
-    title: str
-    director: Optional[str] = None
-    cast: Optional[str] = None
-    country: str
+    id: conint(11)
+    show_id: constr(max_length=50)
+    type: constr(max_length=50)
+    title: constr(max_length=200)
+    director: Optional[constr(max_length=300)] = ""
+    cast: Optional[constr(max_length=1000)] = ""
+    country: constr(200)
     date_added: date
-    release_year: int
-    rating: str
-    duration: str
-    listed_in: str
-    description: Optional[str] = None
+    release_year: conint(11)
+    rating: constr(20)
+    duration: constr(20)
+    listed_in: constr(500)
+    description: Optional[constr(2000)] = ""
     class Config:
         orm_mode=True
 
@@ -27,34 +27,34 @@ class ShowCreate(BaseModel):
     Create Schema based upon the dataset:
     Since we don't know if Netflix would ever change or alter their ID paradigm, we need to respect it's a string.
     """
-    show_id: str
-    type: str
-    title: str
-    director: Optional[str] = None
-    cast: Optional[str] = None
-    country: str
+    show_id: constr(max_length=50)
+    type: constr(max_length=50)
+    title: constr(max_length=200)
+    director: Optional[constr(max_length=300)] = ""
+    cast: Optional[constr(max_length=1000)] = ""
+    country: constr(200)
     date_added: date
-    release_year: int
-    rating: str
-    duration: str
-    listed_in: str
-    description: Optional[str] = None
+    release_year: conint(11)
+    rating: constr(20)
+    duration: constr(20)
+    listed_in: constr(500)
+    description: Optional[constr(2000)] = ""
     class Config:
         orm_mode=True
 
 class ShowSearch(BaseModel):
-    show_id: Optional[str] = None
-    type: Optional[str] = None
-    title: Optional[str] = None
-    director: Optional[str] = None
-    cast: Optional[str] = None
-    country: Optional[str] = None
-    date_added:  Optional[date] = None
-    release_year:  Optional[int] = None
-    rating:  Optional[str] = None
-    duration:  Optional[str] = None
-    listed_in:  Optional[str] = None
-    description: Optional[str] = None
+    show_id: Optional[constr(max_length=50)]=None
+    type: Optional[constr(max_length=50)]=None
+    title: Optional[constr(max_length=200)]=None
+    director: Optional[constr(max_length=300)] = None
+    cast: Optional[constr(max_length=1000)] = None
+    country: Optional[constr(200)]=None
+    date_added: Optional[date]=None
+    release_year: Optional[conint(11)]=None
+    rating: Optional[constr(20)]=None
+    duration: Optional[constr(20)]=None
+    listed_in: Optional[constr(500)]=None
+    description: Optional[constr(2000)] = None
     class Config:
         orm_mode=True
 
