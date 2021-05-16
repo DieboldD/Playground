@@ -12,7 +12,7 @@ class Show(Base):
     """
     __tablename__ = "shows"
 
-    id = Column(Integer(11),primary_key=True,index=True)
+    id = Column(Integer,primary_key=True,index=True)
     show_id = Column(String(50),index=True)
     type = Column(String(50))
     title = Column(String(200))
@@ -20,7 +20,7 @@ class Show(Base):
     cast = Column(String(1000))
     country = Column(String(200))
     date_added = Column(Date)
-    release_year = Column(Integer(11))
+    release_year = Column(Integer)
     rating = Column(String(20))
     duration = Column(String(20))
     listed_in = Column(String(500))
