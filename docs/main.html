@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>main.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>main.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">Depends</span><span class="p">,</span><span class="n">FastAPI</span>
+<span class="kn">from</span> <span class="nn">fastapi.encoders</span> <span class="kn">import</span> <span class="n">jsonable_encoder</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span><span class="p">,</span> <span class="n">extract</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="kn">import</span> <span class="n">label</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
+
+
+<span class="kn">import</span> <span class="nn">models</span><span class="o">,</span> <span class="nn">schemas</span>
+<span class="kn">from</span> <span class="nn">src.database</span> <span class="kn">import</span> <span class="n">SessionLocal</span><span class="p">,</span> <span class="n">engine</span>
+
+<span class="n">models</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Dependency</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">get_db</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">SessionLocal</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">db</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Typical Hello World.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> <span class="s2">&quot;World&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span><span class="s2">&quot;Hello CICD </span><span class="si">{}</span><span class="s2">!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)}</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Show Aggregation, via SQLAlchemy query</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/showAggregation/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">show_summary</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">baseQuery</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+                            <span class="n">label</span><span class="p">(</span><span class="s1">&#39;year_added&#39;</span><span class="p">,</span><span class="n">extract</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">date_added</span><span class="p">)),</span>
+                            <span class="n">label</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span><span class="n">extract</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">date_added</span><span class="p">))</span>
+    <span class="n">ratingAggregation</span> <span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">last5Years</span> <span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">extract</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">date_added</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2021</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">aggregation</span> <span class="o">=</span>  <span class="p">{</span>
+                     <span class="s2">&quot;ShowsAddedByRatingByYear&quot;</span><span class="p">:</span><span class="n">ratingAggregation</span><span class="p">,</span>
+                     <span class="s2">&quot;WithinTheLast5Years&quot;</span><span class="p">:</span><span class="n">last5Years</span>
+                   <span class="p">}</span>
+    <span class="k">return</span> <span class="n">jsonable_encoder</span><span class="p">(</span><span class="n">aggregation</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Raw Get Records</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/shows/&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">schemas</span><span class="o">.</span><span class="n">ShowBase</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">show_records</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">shows</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">shows</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Search by data:
+If a field is not none, then it is considered.
+If results are limited, but page number is not supplied, only the first page will be returned.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/shows/search/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">search_shows</span><span class="p">(</span><span class="n">searchSchema</span><span class="p">:</span><span class="n">schemas</span><span class="o">.</span><span class="n">SearchSchema</span><span class="p">,</span><span class="n">db</span><span class="p">:</span><span class="n">Session</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">s</span><span class="o">=</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">criteria</span>
+    <span class="n">baseQuery</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">show_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">show_id</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">show_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">title</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">director</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">director</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">director</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">cast</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">cast</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">country</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">date_added</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">date_added</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">date_added</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">release_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">release_year</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">release_year</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">rating</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">duration</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">listed_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">listed_in</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">listed_in</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">{}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">description</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">searchSchema</span><span class="o">.</span><span class="n">max_results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span><span class="n">baseQuery</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">max_results</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">searchSchema</span><span class="o">.</span><span class="n">results_per_page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseQuery</span><span class="o">=</span><span class="n">baseQuery</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">page_number</span><span class="o">*</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">results_per_page</span><span class="p">,</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">page_number</span><span class="o">*</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">results_per_page</span><span class="o">+</span><span class="n">searchSchema</span><span class="o">.</span><span class="n">results_per_page</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">baseQuery</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Get Show by primary key</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/show/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">schemas</span><span class="o">.</span><span class="n">ShowBase</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_show</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Create Show</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/show/&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">schemas</span><span class="o">.</span><span class="n">ShowBase</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">s</span><span class="p">:</span><span class="n">schemas</span><span class="o">.</span><span class="n">ShowCreate</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">target</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="p">(</span><span class="n">show_id</span><span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">show_id</span><span class="p">,</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">director</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">director</span><span class="p">,</span>
+        <span class="n">cast</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">cast</span><span class="p">,</span>
+        <span class="n">country</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">country</span><span class="p">,</span>
+        <span class="n">date_added</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">date_added</span><span class="p">,</span>
+        <span class="n">release_year</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">release_year</span><span class="p">,</span>
+        <span class="n">rating</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+        <span class="n">listed_in</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">listed_in</span><span class="p">,</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">description</span>
+    <span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Update existing show.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;/show/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">schemas</span><span class="o">.</span><span class="n">ShowBase</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span><span class="n">schemas</span><span class="o">.</span><span class="n">ShowCreate</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">target</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">show_id</span><span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">show_id</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">title</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">director</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">director</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">cast</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">cast</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">country</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">date_added</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">date_added</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">release_year</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">release_year</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">rating</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">duration</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">listed_in</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">listed_in</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">description</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Delete show by primary key.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;/show/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">target</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Show</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;action&quot;</span> <span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> deleted&quot;</span><span class="p">}</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PORT&quot;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)))</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

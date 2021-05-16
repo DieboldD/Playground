@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>database.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>database.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+
+<span class="n">db_config</span> <span class="o">=</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>[START cloud_sql_mysql_sqlalchemy_limit]
+Pool size is the maximum number of permanent connections to keep.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="s2">&quot;pool_size&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Temporarily exceeds the set pool_size if no connections are available.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="s2">&quot;max_overflow&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>The total number of concurrent connections for your application will be
+a total of pool_size and max_overflow.
+[END cloud_sql_mysql_sqlalchemy_limit]</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>[START cloud_sql_mysql_sqlalchemy_backoff]
+SQLAlchemy automatically uses delays between failed connection attempts,
+but provides no arguments for configuration.
+[END cloud_sql_mysql_sqlalchemy_backoff]</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>[START cloud_sql_mysql_sqlalchemy_timeout]
+&lsquo;pool_timeout&rsquo; is the maximum number of seconds to wait when retrieving a
+new connection from the pool. After the specified amount of time, an
+exception will be thrown.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="s2">&quot;pool_timeout&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>  <span class="c1"># 30 seconds</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>[END cloud_sql_mysql_sqlalchemy_timeout]</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>[START cloud_sql_mysql_sqlalchemy_lifetime]
+&lsquo;pool_recycle&rsquo; is the maximum number of seconds a connection can persist.
+Connections that live longer than the specified amount of time will be
+reestablished</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="s2">&quot;pool_recycle&quot;</span><span class="p">:</span> <span class="mi">1800</span><span class="p">,</span>  <span class="c1"># 30 minutes</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>[END cloud_sql_mysql_sqlalchemy_lifetime]</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="p">}</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Remember - storing secrets in plaintext is potentially unsafe. Consider using
+something like https://cloud.google.com/secret-manager/docs/overview to help keep
+secrets secret.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">db_user</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DB_USER&quot;</span><span class="p">]</span>
+<span class="n">db_pass</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DB_PASS&quot;</span><span class="p">]</span>
+<span class="n">db_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DB_NAME&quot;</span><span class="p">]</span>
+<span class="n">db_socket_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DB_SOCKET_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;/cloudsql&quot;</span><span class="p">)</span>
+<span class="n">cloud_sql_connection_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CLOUD_SQL_CONNECTION_NAME&quot;</span><span class="p">]</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Equivalent URL:
+mysql+pymysql://<db_user>:<db_pass>@/<db_name>?unix_socket=<socket_path>/<cloud_sql_instance_name></p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">engine</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">URL</span><span class="p">(</span>
+        <span class="n">drivername</span><span class="o">=</span><span class="s2">&quot;mysql+pymysql&quot;</span><span class="p">,</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">db_user</span><span class="p">,</span>  <span class="c1"># e.g. &quot;my-database-user&quot;</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">db_pass</span><span class="p">,</span>  <span class="c1"># e.g. &quot;my-database-password&quot;</span>
+        <span class="n">database</span><span class="o">=</span><span class="n">db_name</span><span class="p">,</span>  <span class="c1"># e.g. &quot;my-database-name&quot;</span>
+        <span class="n">query</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;unix_socket&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">db_socket_dir</span><span class="p">,</span>  <span class="c1"># e.g. &quot;/cloudsql&quot;</span>
+                <span class="n">cloud_sql_connection_name</span><span class="p">)</span>  <span class="c1"># i.e &quot;&lt;PROJECT-NAME&gt;:&lt;INSTANCE-REGION&gt;:&lt;INSTANCE-NAME&gt;&quot;</span>
+        <span class="p">}</span>
+    <span class="p">),</span>
+    <span class="o">**</span><span class="n">db_config</span>
+<span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>engine = create_engine(SQLALCHEMY_DATABASE_URL)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">SessionLocal</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">autoflush</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
