@@ -1,12 +1,12 @@
 from datetime import date
 from typing import Optional
-from pydantic import BaseModel, constr,conint
+from pydantic import BaseModel, constr
 
 class ShowBase(BaseModel):
     """
     Standard response schema.
     """
-    id: conint(11)
+    id: int
     show_id: constr(max_length=50)
     type: constr(max_length=50)
     title: constr(max_length=200)
@@ -14,7 +14,7 @@ class ShowBase(BaseModel):
     cast: Optional[constr(max_length=1000)] = ""
     country: constr(200)
     date_added: date
-    release_year: conint(11)
+    release_year: int
     rating: constr(20)
     duration: constr(20)
     listed_in: constr(500)
@@ -34,7 +34,7 @@ class ShowCreate(BaseModel):
     cast: Optional[constr(max_length=1000)] = ""
     country: constr(200)
     date_added: date
-    release_year: conint(11)
+    release_year: int
     rating: constr(20)
     duration: constr(20)
     listed_in: constr(500)
@@ -50,7 +50,7 @@ class ShowSearch(BaseModel):
     cast: Optional[constr(max_length=1000)] = None
     country: Optional[constr(200)]=None
     date_added: Optional[date]=None
-    release_year: Optional[conint(11)]=None
+    release_year: Optional[int]=None
     rating: Optional[constr(20)]=None
     duration: Optional[constr(20)]=None
     listed_in: Optional[constr(500)]=None
