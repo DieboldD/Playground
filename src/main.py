@@ -1,19 +1,16 @@
 import os
-import json
 
 from typing import List
 
-from fastapi import Depends,FastAPI,HTTPException
+from fastapi import Depends,FastAPI
 from fastapi.encoders import jsonable_encoder
-from fastapi.param_functions import Query
 from sqlalchemy import func, extract
 from sqlalchemy.sql import label
-from sqlalchemy.orm import Session, relationship
-from sqlalchemy.sql.functions import current_date
+from sqlalchemy.orm import Session
 
 
-import models,schemas
-from src.database import SessionLocal, engine
+from . import models, schemas
+from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 

@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Date, Integer
 from sqlalchemy.orm import relationship
 
 
-from src.database import Base
+from .database import Base
 
 @dataclass
 class Show(Base):
