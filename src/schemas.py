@@ -61,6 +61,8 @@ class ShowSearch(BaseModel):
 class SearchSchema(BaseModel):
     """
     Search model with additional fields for simple pagination
+    Parital Search is available on:
+    title, director, cast, duration, listed_in, description
     If results are limited, but page number is not supplied, only the first page will be returned.
     """
     criteria:ShowSearch
