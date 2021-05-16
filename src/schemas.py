@@ -18,7 +18,7 @@ class ShowBase(BaseModel):
     rating: constr(max_length=20)
     duration: constr(max_length=20)
     listed_in: constr(max_length=500)
-    description: Optional[constr(max_length=000)] = ""
+    description: Optional[constr(max_length=2000)] = ""
     class Config:
         orm_mode=True
 
