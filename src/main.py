@@ -30,7 +30,7 @@ def hello_world():
     Typical Hello World.
     """
     name = os.environ.get("NAME", "World")
-    return {"message":"Hello CICD {}!".format(name)}
+    return {"message":"Hello Test CICD {}!".format(name)}
 
 @app.get("/showAggregation/")
 def show_summary(db: Session = Depends(get_db)):
