@@ -18,3 +18,4 @@
 - [x] Allow Connection to SQL in Cloud Run
 - [ ] User Authentication
 - [ ] Database Mocking for SQLAlchemy
+- [TEST SCAN]
